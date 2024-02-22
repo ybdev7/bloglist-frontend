@@ -24,6 +24,8 @@ const App = () => {
   const handleLogout = (event) => {
     event.preventDefault();
     setUser(null);
+    window.localStorage.removeItem("loggedBloglistUser");
+    blogService.removeToken();
     showMessage("Successfully logged out");
   };
   const handleLogin = async (event) => {
@@ -35,6 +37,7 @@ const App = () => {
         password,
       });
       setUser(user);
+      window.localStorage.setItem("loggedBloglistUser", JSON.stringify(user));
       setUsername("");
       setPassword("");
     } catch (exception) {
@@ -44,6 +47,15 @@ const App = () => {
 
   useEffect(() => {
     blogService.getAll().then((blogs) => setBlogs(blogs));
+  }, []);
+
+  useEffect(() => {
+    const loggedUserJSON = window.localStorage.getItem("loggedBloglistUser");
+    if (loggedUserJSON) {
+      const user = JSON.parse(loggedUserJSON);
+      setUser(user);
+      blogService.setToken(user.token);
+    }
   }, []);
 
   // login form
