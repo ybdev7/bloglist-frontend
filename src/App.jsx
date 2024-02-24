@@ -6,6 +6,7 @@ import BlogForm from "./components/blogForm";
 import Message from "./components/Message";
 import LoginForm from "./components/LoginForm";
 import Togglable from "./components/Toggable";
+import sorter from "./utils/sorter";
 
 const App = () => {
   const [blogs, setBlogs] = useState([]);
@@ -51,6 +52,25 @@ const App = () => {
     }
   };
 
+  const like = async (blog) => {
+    try {
+      const updatingBlog = { ...blog, likes: blog.likes + 1 };
+      const updatedBlog = await blogService.update(updatingBlog);
+
+      const upb = blogs.map((b) => {
+        return b.id === updatedBlog.id ? updatedBlog : b;
+      });
+
+      //update blogs
+      setBlogs(upb);
+      return updatedBlog;
+    } catch (ex) {
+      console.log("!!Error ", ex);
+
+      showError(ex.response.data.error);
+      return null;
+    }
+  };
   const addBlog = async (newTitle, newAuthor, newUrl) => {
     try {
       console.log("saving ", newTitle);
@@ -60,6 +80,7 @@ const App = () => {
         url: newUrl,
       });
       setBlogs(blogs.concat(blog));
+
       showMessage(`Added ${newTitle}`);
       newBlogFormRef.current.toggleVisibility();
 
@@ -105,6 +126,7 @@ const App = () => {
     );
   }
 
+  console.log("blogs=", blogs);
   return (
     <div>
       <h2>Blogs</h2>
@@ -117,8 +139,8 @@ const App = () => {
         <BlogForm addBlog={addBlog} />
       </Togglable>
 
-      {blogs.map((blog) => (
-        <Blog key={blog.id} blog={blog} />
+      {blogs.sort(sorter.likesComparerDESC).map((blog) => (
+        <Blog key={blog.id} blog={blog} like={like} />
       ))}
     </div>
   );
