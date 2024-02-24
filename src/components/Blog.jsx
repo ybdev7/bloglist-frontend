@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-const Blog = ({ blog, like }) => {
+const Blog = ({ blog, like, deleteBlog, user }) => {
   const blogStyle = {
     paddingTop: 10,
     paddingLeft: 2,
@@ -20,6 +20,9 @@ const Blog = ({ blog, like }) => {
   };
 
   const btnText = showDetails ? "Hide" : "View";
+  console.log("user=", user.username.toString(), blog.user.username.toString());
+  const authorizedToDelete =
+    user.username.toString() == blog.user.username.toString();
 
   return (
     <div style={blogStyle}>
@@ -31,6 +34,15 @@ const Blog = ({ blog, like }) => {
         </p>
       )}
       {showDetails && <p>{blog.user.name}</p>}
+      {showDetails && authorizedToDelete && (
+        <button
+          onClick={() => {
+            deleteBlog(blog);
+          }}
+        >
+          Remove
+        </button>
+      )}
     </div>
   );
 };

@@ -52,6 +52,21 @@ const App = () => {
     }
   };
 
+  const deleteBlog = async (blog) => {
+    if (window.confirm(`Do you really want to delete ${blog.title}?`)) {
+      console.log("deleting.." + blog.id);
+      try {
+        const res = await blogService.deleteBlog(blog.id);
+        console.log("done delete");
+
+        setBlogs(blogs.filter((b) => b.id !== blog.id));
+      } catch (ex) {
+        console.log("!!Error ", ex);
+
+        showError(ex.response.data.error);
+      }
+    }
+  };
   const like = async (blog) => {
     try {
       const updatingBlog = { ...blog, likes: blog.likes + 1 };
@@ -140,7 +155,13 @@ const App = () => {
       </Togglable>
 
       {blogs.sort(sorter.likesComparerDESC).map((blog) => (
-        <Blog key={blog.id} blog={blog} like={like} />
+        <Blog
+          key={blog.id}
+          blog={blog}
+          like={like}
+          deleteBlog={deleteBlog}
+          user={user}
+        />
       ))}
     </div>
   );
