@@ -1,9 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Blog from "./components/Blog";
 import blogService from "./services/blogs";
 import loginService from "./services/login";
 import BlogForm from "./components/blogForm";
 import Message from "./components/Message";
+import LoginForm from "./components/LoginForm";
+import Togglable from "./components/Toggable";
 
 const App = () => {
   const [blogs, setBlogs] = useState([]);
@@ -12,6 +14,8 @@ const App = () => {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [user, setUser] = useState(null);
+
+  const newBlogFormRef = useRef();
 
   const showMessage = (message) => {
     setMessage(message);
@@ -57,6 +61,7 @@ const App = () => {
       });
       setBlogs(blogs.concat(blog));
       showMessage(`Added ${newTitle}`);
+      newBlogFormRef.current.toggleVisibility();
 
       return blog;
     } catch (ex) {
@@ -82,32 +87,6 @@ const App = () => {
     }
   }, []);
 
-  // login form
-  const loginForm = () => (
-    <form onSubmit={handleLogin}>
-      <div>
-        Username
-        <input
-          type="text"
-          value={username}
-          name="Username"
-          onChange={({ target }) => setUsername(target.value)}
-        />
-      </div>
-      <div>
-        Password
-        <input
-          type="password"
-          value={password}
-          name="Password"
-          onChange={({ target }) => setPassword(target.value)}
-        />
-      </div>
-      <button type="submit">Login</button>
-    </form>
-  );
-  // END login form
-
   //App
   const msg = error !== "" ? error : message;
   if (user === null) {
@@ -115,7 +94,13 @@ const App = () => {
       <div>
         <h2>Log in to Blogs</h2>
         <Message message={msg} isError={error !== ""} />
-        {loginForm()}
+        <LoginForm
+          username={username}
+          password={password}
+          setUsername={setUsername}
+          setPassword={setPassword}
+          handleLogin={handleLogin}
+        />
       </div>
     );
   }
@@ -128,7 +113,10 @@ const App = () => {
         {user.name} is logged in
         <button onClick={handleLogout}>Logout</button>
       </div>
-      <BlogForm addBlog={addBlog} />
+      <Togglable buttonLabel="Create New Blog" ref={newBlogFormRef}>
+        <BlogForm addBlog={addBlog} />
+      </Togglable>
+
       {blogs.map((blog) => (
         <Blog key={blog.id} blog={blog} />
       ))}
