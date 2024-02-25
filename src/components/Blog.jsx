@@ -1,4 +1,5 @@
 import { useState } from "react";
+import PropTypes from "prop-types";
 
 const Blog = ({ blog, like, deleteBlog, user }) => {
   const blogStyle = {
@@ -20,7 +21,7 @@ const Blog = ({ blog, like, deleteBlog, user }) => {
   };
 
   const btnText = showDetails ? "Hide" : "View";
-  console.log("user=", user.username.toString(), blog.user.username.toString());
+  //console.log("user=", user.username.toString(), blog.user.username.toString());
   const authorizedToDelete =
     user.username.toString() == blog.user.username.toString();
 
@@ -47,4 +48,10 @@ const Blog = ({ blog, like, deleteBlog, user }) => {
   );
 };
 
+Blog.propTypes = {
+  blog: PropTypes.object.isRequired,
+  like: PropTypes.func.isRequired,
+  deleteBlog: PropTypes.func.isRequired,
+  user: PropTypes.object.isRequired,
+};
 export default Blog;
